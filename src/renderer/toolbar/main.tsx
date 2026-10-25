@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { SiteBadge, TabInfo } from '../../shared/types'
+import type { AdBlockStatus, SiteBadge, TabInfo } from '../../shared/types'
 import '../theme.css'
 import './toolbar.css'
 
@@ -15,6 +15,7 @@ const display = (url: string): string => (url === 'pb://newtab/' ? '' : url)
 function Toolbar() {
   const [tabs, setTabs] = useState<TabInfo[]>([])
   const [badge, setBadge] = useState<SiteBadge | null>(null)
+  const [adblock, setAdBlock] = useState<AdBlockStatus | null>(null)
   const [address, setAddress] = useState('')
   const [editing, setEditing] = useState(false)
   const addressRef = useRef<HTMLInputElement>(null)
@@ -24,6 +25,7 @@ function Toolbar() {
     window.browserApi.onTabs(setTabs)
     window.browserApi.onStatus(setBadge)
     window.browserApi.onFocusAddress(() => addressRef.current?.select())
+    window.browserApi.onAdBlock(setAdBlock)
   }, [])
   useEffect(() => {
     if (!editing) setAddress(display(active?.url ?? ''))
@@ -92,6 +94,20 @@ function Toolbar() {
           <span className={'badge ' + (badge.allowed ? level : 'bad')} title={`${badge.name} time left today`}>
             {badge.name} · {badge.allowed && badge.remainingSec !== undefined ? fmt(badge.remainingSec) : 'blocked'}
           </span>
+        )}
+        {adblock?.site && (
+          <button
+            className={'shield' + (adblock.enabled && !adblock.siteAllowed ? ' on' : '')}
+            aria-label="Ad blocker"
+            title={adblock.enabled && !adblock.siteAllowed ? `${adblock.blocked} ads and trackers blocked` : 'Ad blocking is off for this site'}
+            onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect()
+              window.browserApi.adblockMenu(r.left, r.bottom)
+            }}
+          >
+            🛡
+            {adblock.enabled && !adblock.siteAllowed && adblock.blocked > 0 && <span className="count">{adblock.blocked > 99 ? '99+' : adblock.blocked}</span>}
+          </button>
         )}
         <browser-action-list alignment="bottom right" />
         <button aria-label="Extensions" title="Extensions" onClick={() => window.browserApi.extensions()}>

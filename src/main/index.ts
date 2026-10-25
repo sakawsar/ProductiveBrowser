@@ -1,6 +1,7 @@
-import { app, ipcMain, webContents } from 'electron'
+import { app, ipcMain, Menu, session, webContents } from 'electron'
 import { spawn, type ChildProcess } from 'node:child_process'
 import { join } from 'node:path'
+import { AdBlock } from './adblock'
 import { Browser } from './browser'
 import { applyContentFilter } from './dns'
 import { evictBlocked, installEnforcer, siteForUrl } from './enforcer'
@@ -12,6 +13,8 @@ import { servicePort } from '../shared/protocol'
 import type { Config } from '../shared/types'
 
 const DEV = !app.isPackaged
+// Keep dev runs out of the installed browser's profile (cookies, extensions) and its single-instance lock.
+if (DEV) app.setPath('userData', app.getPath('userData') + ' Dev')
 const service = new ServiceClient(servicePort(DEV))
 
 // Used by the uninstaller: exit 1 while the rules are locked, 0 otherwise.
@@ -47,7 +50,9 @@ async function startApp(): Promise<void> {
   if (DEV) startDevService()
   handleScheme()
   service.start()
-  installEnforcer(() => service.state().sites)
+  const adblock = new AdBlock()
+  await adblock.start(session.defaultSession)
+  installEnforcer(() => service.state().sites, adblock)
 
   let browser: Browser | null = null
   const tracker = new UsageTracker(() => browser, service, () => sendStatus())
@@ -57,7 +62,35 @@ async function startApp(): Promise<void> {
     if (!wc || wc.isDestroyed()) return
     const site = siteForUrl(browser?.active()?.getURL() ?? '', service.state().sites)
     wc.send('status', site ? { name: site.name, allowed: site.allowed, remainingSec: tracker.remaining(site) } : null)
+    const tab = browser?.active()
+    if (tab) wc.send('adblock', adblock.status(tab.getURL(), tab.id))
   }
+
+  // The toolbar shield's menu: per-site and global switches, then reload so the change shows.
+  ipcMain.on('adblock:menu', (e, at: { x: number; y: number }) => {
+    const tab = browser?.active()
+    if (!browser || e.sender !== browser.toolbarContents || !tab) return
+    const status = adblock.status(tab.getURL(), tab.id)
+    const apply = (change: () => void): void => {
+      change()
+      tab.reload()
+      sendStatus()
+    }
+    Menu.buildFromTemplate([
+      { label: `${status.blocked} ads and trackers blocked on this page`, enabled: false },
+      { type: 'separator' },
+      ...(status.site
+        ? [{
+            label: `Block ads on ${status.site}`,
+            type: 'checkbox' as const,
+            checked: status.enabled && !status.siteAllowed,
+            enabled: status.enabled,
+            click: () => apply(() => adblock.setSiteAllowed(status.site!, !status.siteAllowed))
+          }]
+        : []),
+      { label: 'Block ads everywhere', type: 'checkbox', checked: status.enabled, click: () => apply(() => adblock.setEnabled(!status.enabled)) }
+    ]).popup({ window: browser.window, x: Math.round(at.x), y: Math.round(at.y) })
+  })
 
   const internalPages = (): Electron.WebContents[] =>
     webContents.getAllWebContents().filter((wc) => !wc.isDestroyed() && wc.getURL().startsWith('pb://'))

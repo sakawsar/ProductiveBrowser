@@ -16,5 +16,7 @@ contextBridge.exposeInMainWorld('browserApi', {
   extensions: () => ipcRenderer.send('nav:extensions'),
   onTabs: (cb: (tabs: unknown) => void) => ipcRenderer.on('tabs', (_e, tabs) => cb(tabs)),
   onStatus: (cb: (status: unknown) => void) => ipcRenderer.on('status', (_e, s) => cb(s)),
-  onFocusAddress: (cb: () => void) => ipcRenderer.on('focus-address', () => cb())
+  onFocusAddress: (cb: () => void) => ipcRenderer.on('focus-address', () => cb()),
+  adblockMenu: (x: number, y: number) => ipcRenderer.send('adblock:menu', { x, y }),
+  onAdBlock: (cb: (status: unknown) => void) => ipcRenderer.on('adblock', (_e, s) => cb(s))
 })

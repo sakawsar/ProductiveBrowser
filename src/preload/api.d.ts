@@ -1,4 +1,4 @@
-import type { Config, ExtensionInfo, ServiceState, SiteBadge, TabInfo } from '../shared/types'
+import type { AdBlockStatus, Config, ExtensionInfo, ServiceState, SiteBadge, TabInfo } from '../shared/types'
 
 declare global {
   interface Window {
@@ -15,6 +15,8 @@ declare global {
       onTabs(cb: (tabs: TabInfo[]) => void): void
       onStatus(cb: (status: SiteBadge | null) => void): void
       onFocusAddress(cb: () => void): void
+      adblockMenu(x: number, y: number): void
+      onAdBlock(cb: (status: AdBlockStatus) => void): void
     }
     pb: {
       getState(): Promise<ServiceState>

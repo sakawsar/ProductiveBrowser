@@ -18,6 +18,8 @@ A Chromium-based (Electron) browser that limits social media and YouTube to a se
 
 - **Content filter:** an optional [CleanBrowsing](https://cleanbrowsing.org/) DNS filter (Security, Adult or Family), part of the locked rules. This browser resolves every site through it with no fallback. Chrome, Edge, Brave and Firefox are forced to use it through their DNS-over-HTTPS policies.
 
+- **Ad blocker:** built in, using [Ghostery's filter engine](https://github.com/ghostery/adblocker) with its ads-and-tracking lists (downloaded on first run, refreshed daily). The toolbar shield shows how many ads and trackers were blocked on the page. Click it to turn blocking off for a site that breaks, or everywhere. Time limits are checked first, so the ad blocker never lets a blocked site through.
+
 Usage counts while a listed site is the active tab of the focused window, or while any tab on it is playing audio.
 
 ## Develop
@@ -32,6 +34,7 @@ npm run typecheck
 ```
 
 Reset dev data:
+
 - Windows: delete `%LOCALAPPDATA%\ProductiveBrowserDev` and `HKCU\Software\ProductiveBrowserDev`.
 - macOS: delete `~/Library/Application Support/ProductiveBrowserDev` and `~/Library/Preferences/com.productivebrowser.dev.configured`.
 

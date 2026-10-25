@@ -78,3 +78,11 @@ export interface ExtensionInfo {
   name: string
   version: string
 }
+
+/** Ad blocker state for the active tab, shown on the toolbar shield. */
+export interface AdBlockStatus {
+  enabled: boolean
+  site: string | null
+  siteAllowed: boolean
+  blocked: number
+}

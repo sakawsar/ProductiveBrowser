@@ -151,3 +151,25 @@ browser-action-list::part(action) {
 browser-action-list::part(action):hover {
   background: var(--bg-strong);
 }
+.nav .shield {
+  position: relative;
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+.nav .shield.on {
+  filter: none;
+  opacity: 1;
+}
+.shield .count {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  min-width: 16px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 10px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
