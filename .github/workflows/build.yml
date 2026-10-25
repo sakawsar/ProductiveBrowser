@@ -1,0 +1,41 @@
+# Builds the installers. macOS packages can only be built on macOS, so this is how to get one from Windows:
+# run the workflow from the Actions tab (or push a v* tag) and download the artifacts.
+name: Build installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            script: dist:win
+            artifact: dist/*.exe
+          - os: macos-latest
+            script: dist:mac
+            artifact: dist/*.pkg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      # Git on Windows can drop the executable bit, which the pkg install scripts need.
+      - if: runner.os == 'macOS'
+        run: chmod +x build/pkg-scripts/* build/mac/uninstall.sh
+      - run: npm run ${{ matrix.script }}
+        env:
+          # No signing certificate yet: build unsigned. See README for signing and notarization.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ runner.os }}
+          path: ${{ matrix.artifact }}

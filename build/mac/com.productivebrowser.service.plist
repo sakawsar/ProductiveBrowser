@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- LaunchDaemon: runs the Productive Browser service as root with the app's own binary in Node mode. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.productivebrowser.service</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/Productive Browser.app/Contents/MacOS/Productive Browser</string>
+		<string>/Applications/Productive Browser.app/Contents/Resources/app.asar.unpacked/out/main/service.js</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>ELECTRON_RUN_AS_NODE</key>
+		<string>1</string>
+	</dict>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/Library/Logs/ProductiveBrowser/service.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/ProductiveBrowser/service.log</string>
+</dict>
+</plist>

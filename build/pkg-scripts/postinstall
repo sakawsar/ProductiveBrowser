@@ -1,0 +1,14 @@
+#!/bin/sh
+# Installs and starts the Productive Browser LaunchDaemon.
+set -e
+APP="/Applications/Productive Browser.app"
+PLIST="/Library/LaunchDaemons/com.productivebrowser.service.plist"
+
+cp "$APP/Contents/Resources/mac/com.productivebrowser.service.plist" "$PLIST"
+chown root:wheel "$PLIST"
+chmod 644 "$PLIST"
+chmod 755 "$APP/Contents/Resources/mac/uninstall.sh"
+mkdir -p /Library/Logs/ProductiveBrowser
+launchctl bootout system/com.productivebrowser.service 2>/dev/null || true
+launchctl bootstrap system "$PLIST"
+exit 0

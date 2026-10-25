@@ -1,0 +1,17 @@
+<!-- WinSW config: runs the Productive Browser service as LocalSystem. %BASE% is resources\winsw. -->
+<service>
+  <id>ProductiveBrowserService</id>
+  <name>Productive Browser Service</name>
+  <description>Keeps Productive Browser's time limits and locked rules.</description>
+  <executable>%BASE%\..\..\Productive Browser.exe</executable>
+  <arguments>"%BASE%\..\app.asar.unpacked\out\main\service.js"</arguments>
+  <env name="ELECTRON_RUN_AS_NODE" value="1" />
+  <startmode>Automatic</startmode>
+  <onfailure action="restart" delay="5 sec" />
+  <resetfailure>1 hour</resetfailure>
+  <logpath>%ProgramData%\ProductiveBrowser\logs</logpath>
+  <log mode="roll-by-size">
+    <sizeThreshold>1024</sizeThreshold>
+    <keepFiles>3</keepFiles>
+  </log>
+</service>

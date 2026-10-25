@@ -1,0 +1,49 @@
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f3f4f6;
+  --bg-strong: #e5e7eb;
+  --fg: #111827;
+  --fg-muted: #6b7280;
+  --border: #d1d5db;
+  --accent: #2563eb;
+  --accent-fg: #ffffff;
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181b;
+    --bg-soft: #232326;
+    --bg-strong: #2e2e33;
+    --fg: #f4f4f5;
+    --fg-muted: #a1a1aa;
+    --border: #3f3f46;
+    --accent: #60a5fa;
+    --accent-fg: #0b1220;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    color-scheme: dark;
+  }
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.45 'Segoe UI', system-ui, sans-serif;
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}

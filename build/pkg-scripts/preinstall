@@ -1,0 +1,4 @@
+#!/bin/sh
+# Upgrades replace the files the running service uses, so stop it first.
+launchctl bootout system/com.productivebrowser.service 2>/dev/null || true
+exit 0
